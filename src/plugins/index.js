@@ -1,5 +1,5 @@
 import './base'
-import './chartist'
+import './vcharts'
 import './vee-validate'
 import './element'
 import './axios'

@@ -113,12 +113,12 @@
             block
             class="mb-3"
             color="success"
-            href="https://www.creative-tim.com/product/vuetify-material-dashboard"
+            href="https://github.com/duttty/think"
             default
             rel="noopener"
             target="_blank"
           >
-            Free Download
+            Download Think
           </v-btn>
 
           <v-btn
@@ -126,7 +126,7 @@
             class="mb-3"
             color="grey darken-1"
             dark
-            href="https://vuetifyjs.com/components/api-explorer"
+            href="https://github.com/duttty/think"
             default
             rel="noopener"
             target="_blank"

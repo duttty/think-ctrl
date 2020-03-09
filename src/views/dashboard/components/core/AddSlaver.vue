@@ -1,19 +1,19 @@
 <template>
-  <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
+  <el-form ref="ruleForm" :model="ruleForm" :rules="rules">
     <el-form-item prop="slaverName">
       <v-text-field
+        v-model="ruleForm.slaverName"
         class="mr-4 purple-input"
         label="从机名称"
         color="purple"
-        v-model="ruleForm.slaverName"
       />
     </el-form-item>
     <el-form-item prop="slaverIndex">
       <v-text-field
+        v-model="ruleForm.slaverIndex"
         class="mr-4 purple-input"
         label="从机地址"
         color="purple"
-        v-model="ruleForm.slaverIndex"
       />
     </el-form-item>
     <el-form-item prop="templateID">
@@ -24,7 +24,7 @@
         item-value="id"
         label="选择模板"
         outlined
-      ></v-select>
+      />
     </el-form-item>
     <v-btn style="float:right;" fab color="indigo" @click="commit('ruleForm')">
       <v-icon>mdi-plus</v-icon>
@@ -65,7 +65,7 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           // 添加templateName
-          for (let v of this.template) {
+          for (const v of this.template) {
             // 加入模板名称
             if (v.id === this.ruleForm.templateID) {
               this.ruleForm.templateName = v.templateName
@@ -75,7 +75,7 @@ export default {
           const temp = { ...this.ruleForm }
           temp.slaverIndex = parseInt(temp.slaverIndex)
           // 验证从机是否存在
-          for (let v of this.$store.state.slavers) {
+          for (const v of this.$store.state.slavers) {
             if (v.slaverIndex === temp.slaverIndex) {
               if (this.$store.state.editIndex >= 0) {
                 if (

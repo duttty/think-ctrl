@@ -26,55 +26,55 @@
                     placeholder="设备类型"
                     hint="设备类型"
                     persistent-hint
-                  ></v-select>
+                  />
                 </v-flex>
                 <v-flex xs12 md4>
                   <v-text-field
+                    v-model="devName"
                     class="purple-input"
                     label="设备名"
-                    v-model="devName"
                     rounded
                     outlined
                   />
                 </v-flex>
                 <v-flex xs12 md4>
                   <v-text-field
+                    v-model="devID"
                     class="purple-input"
                     label="设备ID"
-                    v-model="devID"
                     rounded
                     outlined
                   />
                 </v-flex>
                 <v-flex xs12 md2>
                   <v-text-field
+                    v-model="position.lng"
                     label="经度"
                     class="purple-input"
-                    v-model="position.lng"
                   />
                 </v-flex>
                 <v-flex xs12 md2>
                   <v-text-field
+                    v-model="position.lat"
                     label="纬度"
                     class="purple-input"
-                    v-model="position.lat"
                   />
                 </v-flex>
                 <v-flex xs12 md6>
                   <v-text-field
+                    v-model="localName"
                     label="位置"
                     class="purple-input"
                     disabled
-                    v-model="localName"
                   />
                 </v-flex>
                 <v-flex xs12 md2>
                   <el-button
-                    @click="drawer = true"
                     style="float:right;"
                     type="primary"
+                    @click="drawer = true"
                   >
-                    {{ this.drawer ? '关闭' : '打开' }}地图
+                    {{ drawer ? '关闭' : '打开' }}地图
                   </el-button>
 
                   <el-drawer
@@ -83,7 +83,7 @@
                     direction="btt"
                     size="40%"
                   >
-                    <myMaps></myMaps>
+                    <myMaps />
                   </el-drawer>
                 </v-flex>
 
@@ -101,7 +101,7 @@
                     icon="el-icon-plus"
                     circle
                     @click="addSlaver"
-                  ></el-button>
+                  />
                 </v-flex>
 
                 <!-- 从机部分 -->
@@ -113,18 +113,17 @@
                   stripe
                   style="width: 100vw"
                 >
-                  <el-table-column prop="slaverName" label="从机名称">
-                  </el-table-column>
-                  <el-table-column prop="slaverIndex" label="从机地址">
-                  </el-table-column>
+                  <el-table-column prop="slaverName" label="从机名称" />
+                  <el-table-column prop="slaverIndex" label="从机地址" />
                   <el-table-column prop="option" label="操作">
                     <template slot-scope="scope">
                       <div style="float:left;">
                         <el-button
                           size="mini"
                           @click="handleEdit(scope.$index, scope.row)"
-                          >编辑</el-button
                         >
+                          编辑
+                        </el-button>
                         &nbsp;
                       </div>
                       <div style="float:left;">
@@ -132,8 +131,9 @@
                           size="mini"
                           type="danger"
                           @click="handleDelete(scope.$index, scope.row)"
-                          >删除</el-button
                         >
+                          删除
+                        </el-button>
                       </div>
                     </template>
                   </el-table-column>
@@ -212,6 +212,20 @@ export default {
       ]
     }
   },
+  computed: {
+    position: function() {
+      return this.$store.state.selectPoint
+    },
+    localName: function() {
+      return this.$store.getters.addr
+    },
+    tableData: function() {
+      return this.$store.state.slavers
+    }
+  },
+  created() {
+    this.$store.dispatch('getTemplate')
+  },
   methods: {
     // TABS
     handleEdit(index, row) {
@@ -259,20 +273,6 @@ export default {
       }
 
       this.$store.dispatch('postDevice', { data: { ...data }, call: this })
-    }
-  },
-  created() {
-    this.$store.dispatch('getTemplate')
-  },
-  computed: {
-    position: function() {
-      return this.$store.state.selectPoint
-    },
-    localName: function() {
-      return this.$store.getters.addr
-    },
-    tableData: function() {
-      return this.$store.state.slavers
     }
   }
 }

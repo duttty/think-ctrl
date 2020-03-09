@@ -13,10 +13,10 @@
           <div>
             <v-text-field
               ref="searchRef"
+              v-model="keyword"
               class="purple-input"
               label="搜索地点"
               prepend-inner-icon="mdi-magnify"
-              v-model="keyword"
               outlined
               rounded
             />
@@ -24,14 +24,14 @@
               :auto-viewport="true"
               :panel="!!keyword"
               :keyword="keyword"
-            ></bm-local-search>
+            />
           </div>
         </bm-control>
 
         <bm-marker
-          class="BM_Marker"
           v-for="k in devList"
           :key="k.idx"
+          class="BM_Marker"
           :position="k.position"
           :animation="k.status ? 'BMAP_ANIMATION_BOUNCE' : ''"
           :icon="{
@@ -39,14 +39,13 @@
             size: { height: 45, width: 55 }
           }"
           @click="devClick(k)"
-        >
-        </bm-marker>
+        />
         <bm-geolocation
           anchor="BMAP_ANCHOR_BOTTOM_RIGHT"
-          :showAddressBar="true"
-          :autoLocation="true"
+          :show-address-bar="true"
+          :auto-location="true"
           @locationSuccess="locationSuccess"
-        ></bm-geolocation>
+        />
       </baidu-map>
     </v-layout>
   </v-container>

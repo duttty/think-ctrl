@@ -1,16 +1,6 @@
 import Vue from 'vue'
-import {
-  extend,
-  ValidationObserver,
-  ValidationProvider,
-} from 'vee-validate'
-import {
-  email,
-  max,
-  min,
-  numeric,
-  required,
-} from 'vee-validate/dist/rules'
+import { extend, ValidationObserver, ValidationProvider } from 'vee-validate'
+import { email, max, min, numeric, required } from 'vee-validate/dist/rules'
 
 extend('email', email)
 extend('max', max)

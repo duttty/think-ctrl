@@ -12,7 +12,7 @@
             <v-layout wrap>
               <v-flex xs12 md12>
                 <el-button round plain type="primary" @click="addTemp">
-                  <i class="el-icon-plus"></i> 添加模板
+                  <i class="el-icon-plus" /> 添加模板
                 </el-button>
               </v-flex>
 
@@ -22,11 +22,11 @@
                 inline
                 :visible.sync="dialogFormVisible"
                 :width="$store.state.mobile ? '70vw' : '50vw'"
-                @close="closeDialog"
                 center
+                @close="closeDialog"
               >
                 <v-container py-0>
-                  <v-layout wrap> </v-layout>
+                  <v-layout wrap />
                   <v-flex xs12 md12>
                     <el-select
                       v-model="selectValue"
@@ -39,72 +39,72 @@
                         :key="idx"
                         :label="item.name"
                         :value="idx"
-                      >
-                      </el-option>
+                      />
                     </el-select>
                   </v-flex>
                   <v-flex xs12 md12>
                     <el-form
+                      ref="form"
                       :model="form"
                       inline
                       size="mini"
                       :rules="rules"
-                      ref="form"
                     >
                       <el-form-item prop="name" label="数据点名称:">
                         <el-input
                           v-model="form.name"
                           autocomplete="off"
-                        ></el-input>
+                        />
                       </el-form-item>
 
                       <el-form-item prop="message" label="采集指令:">
                         <el-input
                           v-model="form.message"
                           autocomplete="off"
-                        ></el-input>
+                        />
                       </el-form-item>
                       <el-form-item prop="frequency" label="采集频率:">
                         <el-select
                           v-model="form.frequency"
                           placeholder="请选择采集频率"
                         >
-                          <el-option label="不采集" :value="0"></el-option>
-                          <el-option label="一分钟" :value="60"></el-option>
-                          <el-option label="五分钟" :value="60 * 5"></el-option>
+                          <el-option label="不采集" :value="0" />
+                          <el-option label="一分钟" :value="60" />
+                          <el-option label="五分钟" :value="60 * 5" />
 
                           <el-input
                             v-model="form.frequency"
                             placeholder="自定义(s)"
-                          ></el-input>
+                          />
                         </el-select>
                       </el-form-item>
                       <el-form-item label="格式化公式:">
                         <el-input
                           v-model="form.formula"
                           autocomplete="off"
-                        ></el-input>
+                        />
                       </el-form-item>
                       <el-form-item prop="dataType" label="数据点类型:">
                         <el-select
                           v-model="form.dataType"
                           placeholder="请选择数据点类型"
                         >
-                          <el-option label="数值" :value="0"></el-option>
-                          <el-option label="开关" :value="1"></el-option>
+                          <el-option label="数值" :value="0" />
+                          <el-option label="开关" :value="1" />
                         </el-select>
                       </el-form-item>
                     </el-form>
                     <div slot="footer" class="dialog-footer">
-                      <el-button type="primary" @click="formSave('form')"
-                        >保存更改</el-button
-                      >
+                      <el-button type="primary" @click="formSave('form')">
+                        保存更改
+                      </el-button>
                       <el-button
                         type="danger"
-                        @click="formCancel"
                         :disabled="selectValue ? false : true"
-                        >删除数据点</el-button
+                        @click="formCancel"
                       >
+                        删除数据点
+                      </el-button>
                       <el-button type="success" @click="formCommit('form')">
                         提交更改
                       </el-button>
@@ -146,17 +146,19 @@
                     <template slot-scope="scope">
                       <el-button
                         size="mini"
-                        @click="handleEdit(scope.$index, scope.row)"
                         type="primary"
-                        >编辑</el-button
+                        @click="handleEdit(scope.$index, scope.row)"
                       >
+                        编辑
+                      </el-button>
 
                       <el-button
                         size="mini"
                         type="danger"
                         @click="handleDelete(scope.$index, scope.row)"
-                        >删除</el-button
                       >
+                        删除
+                      </el-button>
                     </template>
                   </el-table-column>
                 </el-table>
@@ -167,8 +169,7 @@
       </v-flex>
       <!-- 数据点部分 -->
       <v-flex xs12 md4>
-        <base-material-card color="blue" title="数据点" text="编辑数据点">
-        </base-material-card>
+        <base-material-card color="blue" title="数据点" text="编辑数据点" />
       </v-flex>
     </v-layout>
   </v-container>
@@ -199,6 +200,11 @@ export default {
           { required: true, message: '请选择采集频率', trigger: 'blur' }
         ]
       }
+    }
+  },
+  computed: {
+    tableData: function() {
+      return this.$store.state.templates
     }
   },
   created: function() {
@@ -296,11 +302,6 @@ export default {
       this.addTemplate.id = this.tableData[index].id
       this.editTableIndex = index
       this.dialogFormVisible = true
-    }
-  },
-  computed: {
-    tableData: function() {
-      return this.$store.state.templates
     }
   }
 }

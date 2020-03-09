@@ -30,7 +30,7 @@ export default {
       .then(res => {
         const { data } = res
         if (data.code === 200) {
-          payload.call.$message.success(`添加成功`)
+          payload.call.$message.success('添加成功')
           ctx.commit('addTemplates', data.data)
         } else {
           payload.call.$message.error(data.msg)
