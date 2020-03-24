@@ -1,8 +1,8 @@
 <template>
-  <v-container id="user-profile" fluid tag="section">
+  <v-container fill-height fluid>
     <v-row justify="center">
       <v-col cols="12" md="8">
-        <base-material-card>
+        <base-material-card style="height:90%;">
           <template v-slot:heading>
             <div class="display-2 font-weight-light">
               设备管理

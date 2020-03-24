@@ -1,307 +1,320 @@
 <template>
-  <v-container fill-height fluid grid-list-xl>
-    <v-layout justify-center wrap>
-      <v-flex xs12 md8>
-        <base-material-card
-          color="blue"
-          title="模板管理"
-          text="Complete your profile"
+  <v-container fill-height>
+    <v-row justify="center">
+      <v-col class="grey" cols="12" md="8">
+        <v-data-table
+          :headers="headers"
+          :items="templates"
+          sort-by="id"
+          fixed-header
+          height="60vh"
         >
-          <!-- 模板表格部分 -->
-          <v-container py-0>
-            <v-layout wrap>
-              <v-flex xs12 md12>
-                <el-button round plain type="primary" @click="addTemp">
-                  <i class="el-icon-plus" /> 添加模板
-                </el-button>
-              </v-flex>
+          <template v-slot:top>
+            <v-toolbar flat color="white">
+              <v-dialog v-model="dialogName" max-width="500px">
+                <template v-slot:activator="{ on }">
+                  <v-btn color="primary" dark class="mb-2" v-on="on">
+                    新建模板
+                  </v-btn>
+                </template>
+                <v-card>
+                  <v-card-title>
+                    <span class="headline">{{ formTitle }}</span>
+                  </v-card-title>
+                  <v-card-text>
+                    <v-text-field
+                      v-model="editedTemplate.templateName"
+                      label="模板名称"
+                      :error-messages="errorMsg"
+                    />
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer />
+                    <v-btn color="blue darken-1" text @click="addTemplate">
+                      确定
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
 
-              <!-- 添加数据点部分 -->
-              <el-dialog
-                title="数据点管理"
-                inline
-                :visible.sync="dialogFormVisible"
-                :width="$store.state.mobile ? '70vw' : '50vw'"
-                center
-                @close="closeDialog"
+              <!-- 数据点表 -->
+              <v-dialog
+                v-model="dialogForm"
+                max-width="500px"
+                scrollable
+                @click:outside="close"
               >
-                <v-container py-0>
-                  <v-layout wrap />
-                  <v-flex xs12 md12>
-                    <el-select
-                      v-model="selectValue"
-                      size="mini"
-                      placeholder="请选择数据点"
-                      @change="changeSelect"
-                    >
-                      <el-option
-                        v-for="(item, idx) in options"
-                        :key="idx"
-                        :label="item.name"
-                        :value="idx"
-                      />
-                    </el-select>
-                  </v-flex>
-                  <v-flex xs12 md12>
-                    <el-form
-                      ref="form"
-                      :model="form"
-                      inline
-                      size="mini"
-                      :rules="rules"
-                    >
-                      <el-form-item prop="name" label="数据点名称:">
-                        <el-input
-                          v-model="form.name"
-                          autocomplete="off"
-                        />
-                      </el-form-item>
-
-                      <el-form-item prop="message" label="采集指令:">
-                        <el-input
-                          v-model="form.message"
-                          autocomplete="off"
-                        />
-                      </el-form-item>
-                      <el-form-item prop="frequency" label="采集频率:">
-                        <el-select
-                          v-model="form.frequency"
-                          placeholder="请选择采集频率"
-                        >
-                          <el-option label="不采集" :value="0" />
-                          <el-option label="一分钟" :value="60" />
-                          <el-option label="五分钟" :value="60 * 5" />
-
-                          <el-input
-                            v-model="form.frequency"
-                            placeholder="自定义(s)"
+                <v-form ref="form" v-model="valid" lazy-validation>
+                  <v-card>
+                    <v-card-title>
+                      {{ switch1 ? '新建' : '编辑' }}数据点
+                      <v-row>
+                        <v-col cols="5">
+                          <v-switch
+                            v-model="switch1"
+                            label="新建数据点"
                           />
-                        </el-select>
-                      </el-form-item>
-                      <el-form-item label="格式化公式:">
-                        <el-input
-                          v-model="form.formula"
-                          autocomplete="off"
-                        />
-                      </el-form-item>
-                      <el-form-item prop="dataType" label="数据点类型:">
-                        <el-select
-                          v-model="form.dataType"
-                          placeholder="请选择数据点类型"
-                        >
-                          <el-option label="数值" :value="0" />
-                          <el-option label="开关" :value="1" />
-                        </el-select>
-                      </el-form-item>
-                    </el-form>
-                    <div slot="footer" class="dialog-footer">
-                      <el-button type="primary" @click="formSave('form')">
-                        保存更改
-                      </el-button>
-                      <el-button
-                        type="danger"
-                        :disabled="selectValue ? false : true"
-                        @click="formCancel"
-                      >
-                        删除数据点
-                      </el-button>
-                      <el-button type="success" @click="formCommit('form')">
-                        提交更改
-                      </el-button>
-                    </div>
-                  </v-flex>
-                </v-container>
-              </el-dialog>
+                        </v-col>
+                        <v-col cols="7">
+                          <v-select
+                            :disabled="switch1"
+                            :items="editedTemplate.dataPoints"
+                            item-text="name"
+                            return-object
+                            label="选择要修改的数据点"
+                            :rules="[
+                              v => {
+                                if (switch1) {
+                                  return true
+                                }
+                                return !!v || '数据点不能为空'
+                              }
+                            ]"
+                            @change="changeSelect"
+                          />
+                        </v-col>
+                      </v-row>
+                    </v-card-title>
+                    <v-card-text>
+                      <v-container>
+                        <v-row justify="center">
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field
+                              v-model="editedTemplate.templateName"
+                              label="模板名称"
+                              required
+                              :rules="[
+                                v => !!v || '名字不能为空',
+                                v =>
+                                  (v && v.length <= 10) ||
+                                  '名字不能超过10个字符'
+                              ]"
+                            />
+                          </v-col>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field
+                              v-model="editedDataPoint.name"
+                              label="数据点名称"
+                              :rules="[
+                                v => !!v || '名字不能为空',
+                                v =>
+                                  (v && v.length <= 10) ||
+                                  '名字不能超过10个字符'
+                              ]"
+                            />
+                          </v-col>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-select
+                              v-model="editedDataPoint.dataType"
+                              :items="selectData"
+                              item-text="label"
+                              item-value="type"
+                              label="数据类型"
+                              :rules="[
+                                v => {
+                                  if (v === 0 || v === 1) {
+                                    return true
+                                  }
+                                  return '请选择数据类型'
+                                }
+                              ]"
+                            />
+                          </v-col>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field
+                              v-model="editedDataPoint.frequency"
+                              label="采集频率(s)"
+                              type="number"
+                            />
+                          </v-col>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field
+                              v-model="editedDataPoint.message"
+                              label="采集指令"
+                              :rules="[v => !!v || '采集指令不能为空']"
+                            />
+                          </v-col>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field
+                              v-model="editedDataPoint.unit"
+                              label="单位"
+                            />
+                          </v-col>
+                          <v-col cols="12" sm="6" md="12">
+                            <v-text-field
+                              v-model="editedDataPoint.formula"
+                              label="格式化公式"
+                            />
+                          </v-col>
+                        </v-row>
+                      </v-container>
+                    </v-card-text>
 
-              <!-- 模板表格部分 -->
-              <v-flex>
-                <el-table :data="tableData" height="40vh">
-                  <el-table-column prop="templateID" label="模板ID">
-                    <template slot-scope="scope">
-                      <span style="margin-left: 10px">
-                        {{ scope.row.id }}
-                      </span>
-                    </template>
-                  </el-table-column>
-                  <el-table-column prop="templateName" label="模板名称">
-                    <template slot-scope="scope">
-                      <el-popover trigger="hover" placement="top">
-                        <el-tag size="medium">
-                          数据点数目:
-                          {{
-                            scope.row.dataPoints
-                              ? scope.row.dataPoints.length
-                              : 0
-                          }}
-                        </el-tag>
-                        <div slot="reference" class="name-wrapper">
-                          <el-tag size="medium">
-                            {{ scope.row.templateName }}
-                          </el-tag>
-                        </div>
-                      </el-popover>
-                    </template>
-                  </el-table-column>
-                  <el-table-column label="操作">
-                    <template slot-scope="scope">
-                      <el-button
-                        size="mini"
-                        type="primary"
-                        @click="handleEdit(scope.$index, scope.row)"
-                      >
-                        编辑
-                      </el-button>
-
-                      <el-button
-                        size="mini"
-                        type="danger"
-                        @click="handleDelete(scope.$index, scope.row)"
-                      >
-                        删除
-                      </el-button>
-                    </template>
-                  </el-table-column>
-                </el-table>
-              </v-flex>
-            </v-layout>
-          </v-container>
-        </base-material-card>
-      </v-flex>
-      <!-- 数据点部分 -->
-      <v-flex xs12 md4>
-        <base-material-card color="blue" title="数据点" text="编辑数据点" />
-      </v-flex>
-    </v-layout>
+                    <v-card-actions>
+                      <v-btn color="success darken-1" text @click="commit">
+                        提交
+                      </v-btn>
+                      <v-spacer />
+                      <v-btn color="blue darken-1" text @click="save">
+                        保存修改
+                      </v-btn>
+                      <v-btn color="error darken-1" text @click="close">
+                        取消
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-form>
+              </v-dialog>
+            </v-toolbar>
+          </template>
+          <template v-slot:item.actions="{ item }">
+            <v-icon small class="mr-2" @click="editItem(item)">
+              mdi-pencil
+            </v-icon>
+            <v-icon small @click="deleteItem(item)">
+              mdi-delete
+            </v-icon>
+          </template>
+        </v-data-table>
+      </v-col>
+      <v-col class="red" cols="12" md="4">
+        <v-card>
+          <v-card-title>操作说明</v-card-title>
+          <v-card-text>123123</v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
-
 <script>
 export default {
-  data() {
-    return {
-      addTemplate: {},
-      selectValue: 0,
-      options: [],
-      dialogFormVisible: false,
-      form: {},
-      editTableIndex: 0,
-      rules: {
-        name: [
-          { required: true, message: '请输入数据点名称', trigger: 'blur' },
-          { min: 1, max: 10, message: '长度在 1 到 10 个字符', trigger: 'blur' }
-        ],
-        message: [
-          { required: true, message: '请输入采集指令', trigger: 'blur' }
-        ],
-        dataType: [
-          { required: true, message: '请选择数据类型', trigger: 'blur' }
-        ],
-        frequency: [
-          { required: true, message: '请选择采集频率', trigger: 'blur' }
-        ]
-      }
-    }
-  },
+  data: () => ({
+    // 添加模板部分
+    dialogName: false,
+    // 添加数据点部分
+    valid: false,
+    dialogForm: false,
+    editedTemplateIndex: -1,
+    editedtDataPointIndex: -1,
+    switch1: false,
+    selectData: [
+      { type: 0, label: '数值' },
+      { type: 1, label: '开关' }
+    ],
+    editedDataPoint: {},
+    editedTemplate: {
+      dataPoints: []
+    },
+    headers: [
+      {
+        text: '模板ID',
+        align: 'start',
+        value: 'id',
+        sortable: false
+      },
+      { text: '名称', value: 'templateName', sortable: false },
+      { text: '修改时间', value: 'updatedAt', sortable: false },
+      { text: '操作', value: 'actions', sortable: false }
+    ]
+  }),
+
   computed: {
-    tableData: function() {
+    formTitle() {
+      return this.editedTemplateIndex === -1 ? '新建模板' : '编辑模板'
+    },
+    errorMsg() {
+      return this.editedTemplate.templateName ? '' : '名称不能为空'
+    },
+    templates() {
       return this.$store.state.templates
     }
   },
-  created: function() {
+
+  watch: {
+    dialog(val) {
+      val || this.close()
+    }
+  },
+
+  created() {
     this.$store.dispatch('getTemplate')
   },
+
   methods: {
-    // 数据点部分
-    changeSelect(v) {
-      // v 为pointID
-      this.form = { ...this.options[v] }
-    },
-    closeDialog() {
-      this.form = {}
-      this.selectValue = 0
-    },
-
-    // 保存数据点
-    formSave(formName) {
-      // 验证表单
-      this.$refs[formName].validate(valid => {
-        if (valid) {
-          // 修改数据点
-          if (this.selectValue) {
-            this.options.splice(this.selectValue, 1, { ...this.form })
-
-            return
-          }
-          // 添加数据点
-          // 添加数据点至options
-          this.options.push({ ...this.form })
-          // 选中新加的点
-          this.selectValue++
-        }
-        return false
-      })
-    },
-    // 提交模板表单
-    formCommit(formName) {
-      // 修改数据点
-      if (this.addTemplate.id) {
-        this.$store.dispatch('putTemplate', {
-          data: { ...this.addTemplate, dataPoints: this.options.slice(1) },
-          call: this
-        })
-      } else {
-        // 添加模板
-        this.$store.dispatch('postTemplate', {
-          data: { ...this.addTemplate, dataPoints: this.options.slice(1) },
-          call: this
-        })
+    // 添加模板
+    addTemplate() {
+      // 编辑信息初始化
+      this.editedTemplateIndex = -1
+      this.editedDataPointIndex = -1
+      this.editedDataPoint = Object.assign({})
+      if (!this.editedTemplate.templateName) {
+        return
       }
-      // dispatch中关闭dialog ?
-      this.dialogFormVisible = false
-    },
-    formCancel() {
-      // 删除数据点
-      this.options.splice(this.selectValue, 1)
-      this.selectValue = 0
-    },
-    // 模板部分
-    addTemp() {
-      this.$prompt('请输入模板名称:', '提示', {
-        cancelButtonText: '取消',
-        confirmButtonText: '确定',
-        inputPattern: /^[^\s]+$/,
-        inputErrorMessage: '名称不正确'
+      // 验证数据是否存在
+      this.templates.map((v, idx) => {
+        if (v.templateName === this.templateName) {
+          return this.$msg({ color: 'error', content: '模板名称已存在' })
+        }
       })
-        .then(({ value }) => {
-          // 缓存模板
-          this.addTemplate = { templateName: value }
-          // 更新diag数据
-          this.selectValue = 0
-          this.options = [{ name: '新建数据点', id: 0 }]
-          // 打开dialog
-          this.dialogFormVisible = true
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '取消编辑'
+      this.$msg({ color: 'info', content: '请继续添加数据点' })
+
+      // 关闭dialogName 打开dialogForm
+      this.dialogName = false
+
+      this.switch1 = true
+      setTimeout(() => {
+        this.dialogForm = true
+      }, 200)
+    },
+
+    // 数据点部分
+
+    editItem(item) {
+      this.editedTemplateIndex = this.templates.indexOf(item)
+      this.editedTemplate = Object.assign({}, item)
+      this.dialogForm = true
+    },
+    changeSelect(v) {
+      this.editedDataPoint = Object.assign({}, v)
+      this.editedtDataPointIndex = this.editedTemplate.dataPoints.indexOf(v)
+    },
+
+    deleteItem(item) {
+      confirm(`确定删除 ${item.templateName} 吗?`) &&
+        this.$store.dispatch('deleteTemplate', { call: this, v: item })
+    },
+
+    commit() {
+      // 判断是否为更新
+      if (this.editedTemplateIndex >= 0) {
+        return this.$store.dispatch('putTemplate', this)
+      }
+      this.$store.dispatch('postTemplate', this)
+    },
+
+    close() {
+      this.dialogForm = false
+      this.editedDataPoint = Object.assign({})
+      this.editedTemplate = Object.assign({ dataPoints: [] })
+      this.editedTemplateIndex = -1
+      this.switch1 = false
+    },
+
+    save() {
+      // 验证数据
+      if (this.$refs.form.validate()) {
+        // 为添加数据点
+        if (this.switch1) {
+          this.editedTemplate.dataPoints.push({ ...this.editedDataPoint })
+        } else {
+          this.editedTemplate.dataPoints.splice(this.editedtDataPointIndex, 1, {
+            ...this.editedDataPoint
           })
-        })
-    },
-    handleDelete(index, row) {
-      this.$store.dispatch('deleteTemplate', {
-        v: { idx: index, id: row.id },
-        call: this.$message
-      })
-    },
-    handleEdit(index, row) {
-      // 修改编辑数据点
-      this.options = [{ name: '新建数据点', id: 0 }, ...row.dataPoints]
-      // 给addTemplate 添加 名字和 id
-      this.addTemplate.templateName = this.tableData[index].templateName
-      this.addTemplate.id = this.tableData[index].id
-      this.editTableIndex = index
-      this.dialogFormVisible = true
+        }
+      }
+
+      // 调整开关至修改数据点
+      this.switch1 = false
     }
   }
 }

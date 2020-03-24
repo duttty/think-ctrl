@@ -1,12 +1,14 @@
 <template>
   <v-app>
+    <notice />
+
     <dashboard-core-app-bar />
 
     <dashboard-core-drawer />
 
     <dashboard-core-view />
 
-    <dashboard-core-settings v-show="showSetting" />
+    <dashboard-core-settings />
   </v-app>
 </template>
 
@@ -18,18 +20,12 @@ export default {
     DashboardCoreAppBar: () => import('./components/core/AppBar'),
     DashboardCoreDrawer: () => import('./components/core/Drawer'),
     DashboardCoreSettings: () => import('./components/core/Settings'),
-    DashboardCoreView: () => import('./components/core/View')
+    DashboardCoreView: () => import('./components/core/View'),
+    Notice: () => import('./components/core/Notice')
   },
 
   data: () => ({
     expandOnHover: false
-  }),
-  computed: {
-    showSetting: function() {
-      return !(
-        this.$route.path === '/maps/google-maps' || this.$route.path === '/'
-      )
-    }
-  }
+  })
 }
 </script>

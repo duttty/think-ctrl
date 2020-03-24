@@ -113,12 +113,12 @@
             block
             class="mb-3"
             color="success"
-            href="https://github.com/duttty/think"
             default
             rel="noopener"
             target="_blank"
+            @click="setDrawer(!drawer)"
           >
-            Download Think
+            打开导航栏
           </v-btn>
 
           <v-btn
@@ -182,7 +182,7 @@ export default {
   }),
 
   computed: {
-    ...mapState(['barImage'])
+    ...mapState(['barImage', 'drawer'])
   },
 
   watch: {
@@ -207,7 +207,8 @@ export default {
 
   methods: {
     ...mapMutations({
-      setBarImage: 'SET_BAR_IMAGE'
+      setBarImage: 'SET_BAR_IMAGE',
+      setDrawer: 'SET_DRAWER'
     })
   }
 }

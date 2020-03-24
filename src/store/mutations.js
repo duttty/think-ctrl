@@ -10,7 +10,17 @@ export default {
     state.drawer = payload
   },
 
-  //
+  // notice
+
+  setVisible: function(state, payload) {
+    clearTimeout(state.timeout)
+    state.visible = true
+    state.color = payload.color
+    state.content = payload.content
+    state.timeout = setTimeout(() => {
+      state.visible = false
+    }, 2000)
+  },
 
   // 地图部分
   // 设置用户标识

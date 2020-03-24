@@ -18,10 +18,16 @@ import store from './store'
 import './plugins'
 import vuetify from './plugins/vuetify'
 
-// 引入dashboad 样式
-import '../src/assets/style/index.scss'
-
 Vue.config.productionTip = false
+Vue.prototype.$msg = function(payload) {
+  store.commit('setVisible', payload)
+}
+Vue.prototype.$msg.success = function(payload) {
+  store.commit('setVisible', { color: 'success', content: payload })
+}
+Vue.prototype.$msg.error = function(payload) {
+  store.commit('setVisible', { color: 'error', content: payload })
+}
 
 new Vue({
   router,

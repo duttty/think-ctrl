@@ -24,34 +24,41 @@ export default {
     const config = {
       url: 'v1/template',
       method: 'post',
-      data: { username: ctx.state.user.username, ...payload.data }
+      data: { username: ctx.state.user.username, ...payload.editedTemplate }
     }
+
     remote(config)
       .then(res => {
         const { data } = res
         if (data.code === 200) {
-          payload.call.$message.success('添加成功')
+          payload.$msg.success('添加成功')
           ctx.commit('addTemplates', data.data)
+          payload.dialogForm = false
         } else {
-          payload.call.$message.error(data.msg)
+          payload.$msg.error(data.msg)
         }
       })
       .catch(err => console.log(err))
   },
   deleteTemplate: function(ctx, payload) {
-    const { v, call } = payload
     const config = {
       url: 'v1/template',
       method: 'delete',
-      params: { username: ctx.state.user.username, id: v.id }
+      params: {
+        username: ctx.state.user.username,
+        id: payload.v.id
+      }
     }
     remote(config)
       .then(({ data }) => {
         if (data.code === 200) {
-          call.success('删除模板成功')
-          ctx.commit('delTemplates', v.idx)
+          payload.call.$msg.success('删除模板成功')
+          ctx.commit(
+            'delTemplates',
+            ctx.state.templates.indexOf(payload.v.item)
+          )
         } else {
-          call.error(data.msg)
+          payload.call.$msg.error(data.msg)
         }
       })
       .catch(err => console.log(err))
@@ -60,17 +67,18 @@ export default {
     const config = {
       url: 'v1/template',
       method: 'put',
-      data: payload.data
+      data: { ...payload.editedTemplate }
     }
     remote(config).then(({ data }) => {
       if (data.code === 200) {
         ctx.commit('putTemplates', {
-          index: payload.call.editTableIndex,
-          data: data.data
+          index: payload.editedTemplateIndex,
+          data: payload.editedTemplate
         })
-        payload.call.$message.success('修改数据点成功')
+        payload.$msg.success('修改数据点成功')
+        payload.dialogForm = false
       } else {
-        payload.this.$message.error(data.msg)
+        payload.$msg.error(data.msg)
       }
     })
   },

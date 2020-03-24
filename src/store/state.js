@@ -9,6 +9,14 @@ export default {
 
   // 自定义部分
 
+  // notice
+  visible: false,
+  color: 'success',
+  content: '',
+  timeout: 0,
+
+  // 移动端?
+
   mobile: false,
   //
   // 地图部分
