@@ -1,7 +1,7 @@
 <template>
   <v-container fill-height>
     <v-row justify="center">
-      <v-col class="grey" cols="12" md="8">
+      <v-col cols="12" md="8">
         <v-data-table
           :headers="headers"
           :items="templates"
@@ -50,10 +50,7 @@
                       {{ switch1 ? '新建' : '编辑' }}数据点
                       <v-row>
                         <v-col cols="5">
-                          <v-switch
-                            v-model="switch1"
-                            label="新建数据点"
-                          />
+                          <v-switch v-model="switch1" label="新建数据点" />
                         </v-col>
                         <v-col cols="7">
                           <v-select
@@ -177,10 +174,30 @@
           </template>
         </v-data-table>
       </v-col>
-      <v-col class="red" cols="12" md="4">
+      <v-col cols="12" md="4">
         <v-card>
-          <v-card-title>操作说明</v-card-title>
-          <v-card-text>123123</v-card-text>
+          <v-img
+            class="white--text align-end"
+            height="200px"
+            src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+          >
+            <v-card-title>
+              操作说明
+            </v-card-title>
+          </v-img>
+
+          <v-card-text>
+            <span>采集指令:按modbus-rtu协议填写,省略从机地址位与CRC校验位。</span>
+            <br>
+            <br>
+            <v-divider />
+            <span>采集指令:按modbus-rtu协议填写,省略从机地址位与CRC校验位。</span>
+            <br>
+            <br>
+            <v-divider />
+            <span>采集公式:收到数据的处理公式，支持基本数学运算，使用v代表原始数据。</span>
+            <v-divider />
+          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
