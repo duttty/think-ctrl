@@ -160,19 +160,11 @@
           avatar="https://demos.creative-tim.com/vue-material-dashboard/img/marc.aba54d65.jpg"
         >
           <v-card-text class="text-center">
-            <h6 class="display-1 mb-1 grey--text">
-              CEO / CO-FOUNDER
-            </h6>
-
             <h4 class="display-2 font-weight-light mb-3 black--text">
-              Alec Thompson
+              操作说明
             </h4>
 
-            <p class="font-weight-light grey--text">
-              Don't be scared of the truth because we need to restart the human
-              foundation in truth And I love you like Kanye loves Kanye I love
-              Rick Owens’ bed design but the back is...
-            </p>
+            <p class="font-weight-light grey--text" />
 
             <v-btn color="success" rounded class="mr-0">
               Follow
@@ -206,9 +198,7 @@ export default {
       devID: '',
       sList: [
         { name: '默认', id: 0 },
-        { name: 'TCP', id: 1 },
-        { name: 'UDP', id: 2 },
-        { name: '串口', id: 3 }
+        { name: '串口', id: 1 }
       ]
     }
   },
