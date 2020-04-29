@@ -20,7 +20,7 @@ export default new Router({
         // Pages
         {
           name: '设备管理',
-          path: 'pages/user',
+          path: 'pages/device',
           component: () => import('@/views/dashboard/pages/UserProfile')
         },
         {
@@ -29,31 +29,21 @@ export default new Router({
           component: () => import('@/views/dashboard/component/Notifications')
         },
         {
-          name: 'Icons',
-          path: 'components/icons',
-          component: () => import('@/views/dashboard/component/Icons')
-        },
-        {
           name: '模板管理',
-          path: 'components/typography',
+          path: 'components/template',
           component: () => import('@/views/dashboard/component/Typography')
         },
-        // Tables
-        {
-          name: 'Regular Tables',
-          path: 'tables/regular-tables',
-          component: () => import('@/views/dashboard/tables/RegularTables')
-        },
+
         // Maps
         {
           name: '地图展示',
-          path: 'maps/google-maps',
+          path: 'maps/maps',
           component: () => import('@/views/dashboard/maps/Maps')
         },
         // Upgrade
         {
-          name: 'Upgrade',
-          path: 'upgrade',
+          name: '设置',
+          path: 'config',
           component: () => import('@/views/dashboard/Upgrade')
         }
       ]

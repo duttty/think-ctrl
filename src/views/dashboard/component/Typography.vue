@@ -8,6 +8,7 @@
           sort-by="id"
           fixed-header
           height="60vh"
+          no-data-text="请新建模板"
         >
           <template v-slot:top>
             <v-toolbar flat color="white">
@@ -119,9 +120,9 @@
                           </v-col>
                           <v-col cols="12" sm="6" md="4">
                             <v-text-field
+                              type="number"
                               v-model="editedDataPoint.frequency"
                               label="采集频率(s)"
-                              type="number"
                             />
                           </v-col>
                           <v-col cols="12" sm="6" md="4">
@@ -187,15 +188,21 @@
           </v-img>
 
           <v-card-text>
-            <span>采集指令:按modbus-rtu协议填写,省略从机地址位与CRC校验位。</span>
-            <br>
-            <br>
+            <span
+              >采集指令:按modbus-rtu协议填写,省略从机地址位与CRC校验位。</span
+            >
+            <br />
+            <br />
             <v-divider />
-            <span>采集指令:按modbus-rtu协议填写,省略从机地址位与CRC校验位。</span>
-            <br>
-            <br>
+            <span
+              >采集指令:按modbus-rtu协议填写,省略从机地址位与CRC校验位。</span
+            >
+            <br />
+            <br />
             <v-divider />
-            <span>采集公式:收到数据的处理公式，支持基本数学运算，使用v代表原始数据。</span>
+            <span
+              >采集公式:收到数据的处理公式，支持基本数学运算，使用v代表原始数据。</span
+            >
             <v-divider />
           </v-card-text>
         </v-card>
@@ -318,6 +325,8 @@ export default {
     },
 
     save() {
+      // 字符串转为数字、
+      this.editedDataPoint.frequency = parseInt(this.editedDataPoint.frequency)
       // 验证数据
       if (this.$refs.form.validate()) {
         // 为添加数据点

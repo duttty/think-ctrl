@@ -32,6 +32,7 @@ export default {
     state.mapInstance = map
   },
   setSelectPoint: function(state, selectPoint) {
+    state.position = `${selectPoint.lat},${selectPoint.lng}`
     state.selectPoint = selectPoint
   },
   setLastMarker: function(state, lastMarker) {
@@ -55,33 +56,19 @@ export default {
     state.templates.splice(payload, 1)
   },
   //
-  // 添加设备部分
+  // 设备部分
 
-  // 设置设备
   setDevice: function(state, payload) {
     state.devices = [...payload]
   },
+  putDevice: function(state, payload) {
+    state.devices.splice(payload.index, 1, { ...payload.data })
+  },
+  addDevice: function(state, payload) {
+    state.devices.push(payload)
+  },
 
-  // 从机部分
-
-  // 设置被编辑从机的序号
-  setEditIndex: function(state, payload) {
-    state.editIndex = payload
-  },
-  // 设置正在编辑的从机信息
-  setEditSlaver: function(state, payload) {
-    state.editSlaver = { ...payload }
-  },
-  // 修改从机
-  setSlaver: function(state, payload) {
-    if (state.editIndex >= 0) {
-      state.slavers.splice(state.editIndex, 1, { ...payload })
-      return
-    }
-    state.slavers.push({ ...payload })
-  },
-  // 删除从机
-  delSlaver: function(state, payload) {
-    state.slavers.splice(payload, 1)
+  delDevice: function(state, payload) {
+    state.devices.splice(payload, 1)
   }
 }

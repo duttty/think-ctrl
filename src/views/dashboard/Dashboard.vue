@@ -6,11 +6,12 @@
           <div class="r_card primary">
             <div class="item_header">
               <div class="title">
-                Ve-histogram
+                变化趋势图
               </div>
             </div>
             <div class="item_content">
               <div class="chart_wrap">
+                <!-- 原始代码 -->
                 <ve-histogram
                   :data="chartData"
                   :extend="chartExtend"
@@ -22,18 +23,16 @@
           <div class="r_card  primary">
             <div class="item_header">
               <div class="title">
-                Ve-line
+                变化趋势
               </div>
             </div>
             <div class="item_content">
               <div class="tool">
                 <div class="t">
                   <div class="i">
-                    Daily Income
+                    变化率
                   </div>
-                  <div class="r">
-                    <v-icon>mdi-arrow-up</v-icon>38%
-                  </div>
+                  <div class="r"><v-icon>mdi-arrow-up</v-icon>38%</div>
                 </div>
                 <div class="v">
                   584
@@ -139,7 +138,7 @@
       </div>
       <div class="right">
         <div class="r_card  primary">
-          <div class="arrow" @click="handlePieBoxVisibleStatus">
+          <!-- <div class="arrow" @click="handlePieBoxVisibleStatus">
             <v-btn icon>
               <v-icon v-if="pieBoxVisible">
                 mdi-arrow-left-thick
@@ -148,8 +147,8 @@
                 mdi-arrow-right-thick
               </v-icon>
             </v-btn>
-          </div>
-          <div class="inner_item" :class="{ inner_item_hide: pieBoxVisible }">
+          </div> -->
+          <!-- <div class="inner_item" :class="{ inner_item_hide: pieBoxVisible }">
             <div class="inner_item_content" style="margin-top: 140px">
               <ve-ring
                 :data="pieData"
@@ -158,20 +157,27 @@
                 height="460px"
               />
             </div>
-          </div>
+          </div> -->
           <div class="item_header">
-            <div class="title" @click="handlePieBoxVisibleStatus">
-              Visitors Analytics
-            </div>
+            <button class="title" @click="changeType">
+              切换显示模式
+            </button>
           </div>
           <div class="item_content">
             <div class="chart_wrap" style="margin-top: 30px">
-              <ve-line
+              <!-- <ve-line
                 :data="chartData3"
                 :extend="chartExtend3"
                 :settings="chartSettings3"
                 height="560px"
-              />
+              /> -->
+
+              <ve-chart
+                :data="chartData"
+                :settings="chartSettingsNew"
+                :extend="chartExtend"
+                height="500px"
+              ></ve-chart>
             </div>
           </div>
         </div>
@@ -265,7 +271,7 @@
         <div class="item_content">
           <div
             class="image"
-            style="background-image: url(&quot;http://akveo.com/ngx-admin/assets/images/cover2.jpg&quot;); background-position: center center;"
+            style='background-image: url("http://akveo.com/ngx-admin/assets/images/cover2.jpg"); background-position: center center;'
           />
           <div class="title">
             Miusic - name
@@ -314,14 +320,46 @@ export default {
       ex1: { label: 'color', val: 25, color: '#a16eff' },
       pieBoxVisible: false,
       reversal: false,
-      url: 'http://akveo.com/ngx-admin/assets/images/camera1.jpg'
+      url: 'http://akveo.com/ngx-admin/assets/images/camera1.jpg',
+
+      // add
+      chartData: {
+        columns: ['日期', '访问用户'],
+        rows: [
+          { 日期: '1月1日', 访问用户: 1523 },
+          { 日期: '1月2日', 访问用户: 1223 },
+          { 日期: '1月3日', 访问用户: 2123 },
+          { 日期: '1月4日', 访问用户: 4123 },
+          { 日期: '1月5日', 访问用户: 3123 },
+          { 日期: '1月6日', 访问用户: 7123 }
+        ]
+      },
+      typeArr: ['line', 'histogram', 'pie'],
+      index: 0
     }
   },
   mounted() {
     this.$vuetify.theme.themes.light.primary = '#323259'
     // this.$store.commit('handleSetColor', '#323259')
   },
+  computed: {
+    chartSettingsNew: {
+      set: function() {},
+      get: function() {
+        return { type: this.typeArr[this.index] }
+      }
+    }
+  },
   methods: {
+    // new
+    changeType() {
+      this.index++
+      if (this.index >= this.typeArr.length) {
+        this.index = 0
+      }
+      this.chartSettings = { type: this.typeArr[this.index] }
+    },
+    // old
     handlePieBoxVisibleStatus() {
       this.pieBoxVisible = !this.pieBoxVisible
     },

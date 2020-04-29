@@ -20,11 +20,7 @@
               outlined
               rounded
             />
-            <bm-local-search
-              :auto-viewport="true"
-              :panel="!!keyword"
-              :keyword="keyword"
-            />
+            <bm-local-search :panel="!!keyword" :keyword="keyword" />
           </div>
         </bm-control>
 
@@ -127,7 +123,9 @@ export default {
         r => {
           if (geolocation.getStatus() === 0) {
             this.center = r.point
+            const { lat, lng } = r.point
             this.zoom = 15
+            this.$store.position = lat + ',' + lng
           } else {
             this.$message.error('定位失败')
           }
@@ -143,6 +141,7 @@ export default {
     },
     clickMap(e) {
       this.$refs.searchRef.blur()
+      this.keyword = ''
       const { map, BMap } = this.$store.state.mapInstance
       const point = e.point
       const last = this.$store.state.lastMarker
@@ -150,7 +149,11 @@ export default {
       map.removeOverlay(last)
       const marker = new BMap.Marker(point)
       geoc.getLocation(point, res => {
-        this.$store.commit('setLocation', res.addressComponents)
+        const { city, district, street, streetNumber } = res.addressComponents
+        this.$store.commit(
+          'setLocation',
+          city + district + street + streetNumber
+        )
       })
       map.addOverlay(marker)
       this.$store.commit('setSelectPoint', point)

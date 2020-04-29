@@ -55,9 +55,9 @@
     <template v-slot:append>
       <base-item
         :item="{
-          title: 'upgrade',
-          icon: 'mdi-package-up',
-          to: '/upgrade'
+          title: '设置',
+          icon: 'mdi-plus',
+          to: '/config'
         }"
       />
     </template>
@@ -88,30 +88,20 @@ export default {
       {
         icon: 'mdi-account',
         title: '设备管理',
-        to: '/pages/user'
-      },
-      {
-        title: 'rtables',
-        icon: 'mdi-clipboard-outline',
-        to: '/tables/regular-tables'
+        to: '/pages/device'
       },
       {
         title: '模板管理',
         icon: 'mdi-format-font',
-        to: '/components/typography'
-      },
-      {
-        title: 'icons',
-        icon: 'mdi-chart-bubble',
-        to: '/components/icons'
+        to: '/components/template'
       },
       {
         title: '地图展示',
         icon: 'mdi-map-marker',
-        to: '/maps/google-maps'
+        to: '/maps/maps'
       },
       {
-        title: 'notifications',
+        title: '通知',
         icon: 'mdi-bell',
         to: '/components/notifications'
       }

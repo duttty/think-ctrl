@@ -24,6 +24,7 @@ export default {
   selectPoint: '',
   lastMarker: '',
   location: '',
+  position: '',
   // 网络部分
   token:
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjM4MTE2Mjc5NyIsInBhc3N3b3JkIjoiMTIzNDU2IiwiZXhwIjoxNTgzMjE5Mjk5LCJpc3MiOiJtc2VydmVyIn0.8N_2QEeqx-f2MrwDtc6x9S83rxP135Z6O7dpob3bG_A',

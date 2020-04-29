@@ -1,268 +1,383 @@
 <template>
-  <v-container fill-height fluid>
+  <v-container fill-height>
     <v-row justify="center">
       <v-col cols="12" md="8">
-        <base-material-card style="height:90%;">
-          <template v-slot:heading>
-            <div class="display-2 font-weight-light">
-              设备管理
-            </div>
-
-            <div class="subtitle-1 font-weight-light">
-              Complete your profile
-            </div>
-          </template>
-
-          <v-form>
-            <v-container py-0>
-              <v-layout wrap>
-                <v-flex xs12 md4>
-                  <v-select
-                    v-model="devType"
-                    :items="sList"
-                    item-text="name"
-                    item-value="id"
-                    label="选择设备类型"
-                    placeholder="设备类型"
-                    hint="设备类型"
-                    persistent-hint
-                  />
-                </v-flex>
-                <v-flex xs12 md4>
-                  <v-text-field
-                    v-model="devName"
-                    class="purple-input"
-                    label="设备名"
-                    rounded
-                    outlined
-                  />
-                </v-flex>
-                <v-flex xs12 md4>
-                  <v-text-field
-                    v-model="devID"
-                    class="purple-input"
-                    label="设备ID"
-                    rounded
-                    outlined
-                  />
-                </v-flex>
-                <v-flex xs12 md2>
-                  <v-text-field
-                    v-model="position.lng"
-                    label="经度"
-                    class="purple-input"
-                  />
-                </v-flex>
-                <v-flex xs12 md2>
-                  <v-text-field
-                    v-model="position.lat"
-                    label="纬度"
-                    class="purple-input"
-                  />
-                </v-flex>
-                <v-flex xs12 md6>
-                  <v-text-field
-                    v-model="localName"
-                    label="位置"
-                    class="purple-input"
-                    disabled
-                  />
-                </v-flex>
-                <v-flex xs12 md2>
-                  <el-button
-                    style="float:right;"
-                    type="primary"
-                    @click="drawer = true"
-                  >
-                    {{ drawer ? '关闭' : '打开' }}地图
-                  </el-button>
-
-                  <el-drawer
-                    :visible.sync="drawer"
-                    :with-header="false"
-                    direction="btt"
-                    size="40%"
-                  >
-                    <myMaps />
-                  </el-drawer>
-                </v-flex>
-
-                <!-- 添加从机部分 -->
-                <v-flex xs12 md12>
-                  <el-dialog
-                    :visible.sync="dialogShow"
-                    center
-                    :title="showTitle"
-                  >
-                    <add-slaver @showDialog="closeDialog" />
-                  </el-dialog>
-                  <el-button
-                    type="primary"
-                    icon="el-icon-plus"
-                    circle
-                    @click="addSlaver"
-                  />
-                </v-flex>
-
-                <!-- 从机部分 -->
-                <el-table
-                  size="mini"
-                  :data="tableData"
-                  max-height="300"
-                  border
-                  stripe
-                  style="width: 100vw"
-                >
-                  <el-table-column prop="slaverName" label="从机名称" />
-                  <el-table-column prop="slaverIndex" label="从机地址" />
-                  <el-table-column prop="option" label="操作">
-                    <template slot-scope="scope">
-                      <div style="float:left;">
-                        <el-button
-                          size="mini"
-                          @click="handleEdit(scope.$index, scope.row)"
-                        >
-                          编辑
-                        </el-button>
-                        &nbsp;
-                      </div>
-                      <div style="float:left;">
-                        <el-button
-                          size="mini"
-                          type="danger"
-                          @click="handleDelete(scope.$index, scope.row)"
-                        >
-                          删除
-                        </el-button>
-                      </div>
-                    </template>
-                  </el-table-column>
-                </el-table>
-                <v-flex xs12 text-xs-right>
-                  <v-btn
-                    class="mx-0 font-weight-light"
-                    color="success"
-                    @click="devCommit"
-                  >
-                    添加设备
-                  </v-btn>
-                </v-flex>
-              </v-layout>
-            </v-container>
-            <!-- 右边说明文档部分 -->
-          </v-form>
-        </base-material-card>
-      </v-col>
-
-      <v-col cols="12" md="4">
-        <base-material-card
-          class="v-card-profile"
-          avatar="https://demos.creative-tim.com/vue-material-dashboard/img/marc.aba54d65.jpg"
+        <v-data-table
+          class="elevation-2"
+          :headers="headers"
+          :items="devices"
+          sort-by="id"
+          fixed-header
+          height="60vh"
+          no-data-text="请新建设备"
         >
-          <v-card-text class="text-center">
-            <h4 class="display-2 font-weight-light mb-3 black--text">
+          <template v-slot:top>
+            <v-toolbar flat color="white">
+              <v-dialog v-model="dialogName" max-width="500px">
+                <template v-slot:activator="{ on }">
+                  <v-btn color="primary" dark class="mb-2" v-on="on">
+                    新建设备
+                  </v-btn>
+                </template>
+                <v-card>
+                  <v-card-title>
+                    <span class="headline">{{ formTitle }}</span>
+                  </v-card-title>
+                  <v-card-text>
+                    <v-text-field
+                      v-model="editedDevice.deviceName"
+                      label="设备名称"
+                      :error-messages="errorMsg"
+                    />
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer />
+                    <v-btn color="blue darken-1" text @click="addDevice">
+                      确定
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+
+              <!-- 从机表 -->
+              <v-dialog
+                v-model="dialogForm"
+                max-width="500px"
+                scrollable
+                @click:outside="close"
+              >
+                <v-form ref="form" v-model="valid" lazy-validation>
+                  <v-card>
+                    <v-card-title>
+                      {{ switch1 ? '新建' : '编辑' }}从机
+                      <v-row>
+                        <v-col cols="5">
+                          <v-switch v-model="switch1" label="新建从机" />
+                        </v-col>
+                        <v-col cols="7">
+                          <v-select
+                            :disabled="switch1"
+                            :items="editedDevice.slavers"
+                            item-text="slaverName"
+                            return-object
+                            label="选择要修改的从机"
+                            :rules="[
+                              v => {
+                                if (switch1) {
+                                  return true
+                                }
+                                return !!v || '从机不能为空'
+                              }
+                            ]"
+                            @change="changeSelect"
+                          />
+                        </v-col>
+                      </v-row>
+                    </v-card-title>
+                    <v-card-text>
+                      <v-container>
+                        <v-row justify="center">
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field
+                              v-model="editedDevice.deviceName"
+                              label="设备名称"
+                              required
+                              :rules="[
+                                v => !!v || '名字不能为空',
+                                v =>
+                                  (v && v.length <= 6) || '名字不能超过10个字符'
+                              ]"
+                            />
+                          </v-col>
+                          <v-col cols="12" sm="6" md="8">
+                            <v-select
+                              no-data-text="请添加模板"
+                              v-model="tS"
+                              :items="$store.state.templates"
+                              item-text="templateName"
+                              item-value="id"
+                              label="绑定模板"
+                              return-object
+                              @change="selectTemplate"
+                              :rules="[
+                                v => {
+                                  if (v) {
+                                    return true
+                                  }
+                                  return '请选择数据模板'
+                                }
+                              ]"
+                            />
+                          </v-col>
+                          <v-col cols="12" md="4">
+                            <v-text-field
+                              v-model="editedSlaver.slaverName"
+                              label="从机名称"
+                              :rules="[
+                                v => !!v || '名字不能为空',
+                                v =>
+                                  (v && v.length <= 6) || '名字不能超过6个字符'
+                              ]"
+                            />
+                          </v-col>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field
+                              v-model="editedSlaver.slaverIndex"
+                              label="从机地址"
+                              type="number"
+                            />
+                          </v-col>
+                          <v-col cols="12" md="4">
+                            <v-text-field
+                              v-model="editedDevice.devID"
+                              label="设备ID"
+                              :rules="[
+                                v => v.length === 8 || '设备ID长度为8位'
+                              ]"
+                            />
+                          </v-col>
+                          <v-col cols="8">
+                            <v-text-field v-model="location" label="设备地址" />
+                          </v-col>
+                          <v-col cols="4">
+                            <v-bottom-sheet v-model="sheet">
+                              <template v-slot:activator="{ on }">
+                                <v-btn color="orange" dark v-on="on">
+                                  打开地图
+                                </v-btn>
+                              </template>
+                              <v-sheet
+                                class="text-center"
+                                :height="$store.state.mobile ? '60vh' : '30vh'"
+                              >
+                                <myMaps
+                              /></v-sheet>
+                            </v-bottom-sheet>
+                          </v-col>
+                        </v-row>
+                      </v-container>
+                    </v-card-text>
+
+                    <v-card-actions>
+                      <v-btn color="success darken-1" text @click="commit">
+                        提交
+                      </v-btn>
+                      <v-spacer />
+                      <v-btn color="blue darken-1" text @click="save">
+                        保存修改
+                      </v-btn>
+                      <v-btn color="error darken-1" text @click="close">
+                        取消
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-form>
+              </v-dialog>
+            </v-toolbar>
+          </template>
+          <template v-slot:item.actions="{ item }">
+            <v-icon small class="mr-2" @click="editItem(item)">
+              mdi-pencil
+            </v-icon>
+            <v-icon class="mr-2" small @click="deleteItem(item)">
+              mdi-delete
+            </v-icon>
+          </template>
+        </v-data-table>
+      </v-col>
+      <v-col cols="12" md="4">
+        <v-card>
+          <v-img
+            class="white--text align-end"
+            height="200px"
+            src="https://bing.ioliu.cn/v1?w=320&h=240"
+          >
+            <v-card-title>
               操作说明
-            </h4>
+            </v-card-title>
+          </v-img>
 
-            <p class="font-weight-light grey--text" />
-
-            <v-btn color="success" rounded class="mr-0">
-              Follow
-            </v-btn>
+          <v-card-text>
+            <span>设备ID:填写8位数字。</span>
+            <br />
+            <br />
+            <v-divider />
+            <span>从机地址:填写Modbus协议的从机地址数字。</span>
+            <br />
+            <br />
+            <v-divider />
+            <span>设备地址:点击打开地图从地图上选取，也可以手动输入。</span>
+            <v-divider />
           </v-card-text>
-        </base-material-card>
+        </v-card>
       </v-col>
     </v-row>
   </v-container>
 </template>
-
 <script>
 import myMaps from '../components/core/MyMaps'
-import addSlaver from '../components/core/AddSlaver'
 export default {
   components: {
-    myMaps,
-    addSlaver
+    myMaps
   },
-  data() {
-    return {
-      // 添加从机部分
-      showTitle: '',
-      dialogShow: false,
+  data: () => ({
+    // 添加模板部分
+    dialogName: false,
+    sheet: false,
+    // 添加从机点部分
+    tS: {},
+    valid: false,
+    dialogForm: false,
+    editedDeviceIndex: -1,
+    editedtSlaverIndex: -1,
+    switch1: false,
+    editedSlaver: {
+      slaverName: ''
+    },
+    editedDevice: {
+      slavers: [],
+      deviceName: '',
+      devID: ''
+    },
+    headers: [
+      {
+        text: '设备ID',
+        align: 'start',
+        value: 'devID',
+        sortable: false
+      },
+      { text: '名称', value: 'deviceName', sortable: false },
+      { text: '修改时间', value: 'updatedAt', sortable: false },
+      { text: '操作', value: 'actions', sortable: false }
+    ]
+  }),
 
-      // 地图部分
-      drawer: false,
-      // 设备部分
-      devType: 0,
-      devName: '',
-      devID: '',
-      sList: [
-        { name: '默认', id: 0 },
-        { name: '串口', id: 1 }
-      ]
-    }
-  },
   computed: {
-    position: function() {
-      return this.$store.state.selectPoint
+    location: {
+      set: function(v) {
+        this.$store.commit('setLocation', v)
+      },
+      get: function() {
+        return this.$store.state.location
+      }
     },
-    localName: function() {
-      return this.$store.getters.addr
+    formTitle() {
+      return this.editedDeviceIndex === -1 ? '新建设备' : '编辑设备'
     },
-    tableData: function() {
-      return this.$store.state.slavers
+    errorMsg() {
+      return this.editedDevice.deviceName ? '' : '名称不能为空'
+    },
+    devices() {
+      return this.$store.state.devices
     }
   },
+
+  watch: {
+    dialog(val) {
+      val || this.close()
+    }
+  },
+
   created() {
     this.$store.dispatch('getTemplate')
+    this.$store.dispatch('getDevice')
   },
+
   methods: {
-    // TABS
-    handleEdit(index, row) {
-      this.showTitle = `修改从机 ${row.slaverIndex} `
-      this.$store.commit('setEditIndex', index)
-      this.$store.commit('setEditSlaver', row)
-      this.dialogShow = true
-    },
-    handleDelete(index, row) {
-      this.$message.success(`删除从机 ${row.slaverIndex} 成功`)
-      this.$store.commit('delSlaver', index)
+    // 添加模板
+    addDevice() {
+      // 编辑信息初始化
+      this.editedDeviceIndex = -1
+      this.editedSlaverIndex = -1
+      this.editedSlaver = Object.assign({ slaverName: '' })
+      if (!this.editedDevice.deviceName) {
+        return
+      }
+      // 验证数据是否存在
+      this.devices.map((v, idx) => {
+        if (v.deviceName === this.deviceName) {
+          return this.$msg({ color: 'error', content: '设备名称已存在' })
+        }
+      })
+      this.$msg({ color: 'info', content: '请继续添加从机' })
+
+      // 关闭dialogName 打开dialogForm
+      this.dialogName = false
+
+      this.switch1 = true
+      setTimeout(() => {
+        this.dialogForm = true
+      }, 200)
     },
 
-    // dialog 方法
-    // 传入dialog 的方法
-    closeDialog(w) {
-      this.dialogShow = w
+    // 从机部分
+
+    // 选中模板
+    selectTemplate(v) {
+      this.editedSlaver.templateID = v.id
+      this.editedSlaver.templateName = v.templateName
     },
-    diagClose() {
-      // 重置编辑序号
-      this.$store.commit('setEditIndex', -1)
-      this.$store.commit('setEditSlaver', {})
+    editItem(item) {
+      this.editedDeviceIndex = this.devices.indexOf(item)
+      this.editedDevice = Object.assign({}, item)
+      this.dialogForm = true
     },
-    // 添加从机
-    addSlaver() {
-      // 显示内容
-      this.showTitle = '添加从机'
-      // 添加位 -1
-      this.$store.commit('setEditIndex', -1)
-      // 打开dialog
-      this.dialogShow = true
+    changeSelect(v) {
+      this.editedSlaver = Object.assign({}, v)
+      this.tS = Object.assign({
+        id: v.templateID,
+        templateName: v.templateName
+      })
+      this.$store.commit('setLocation', this.editedDevice.addr)
+      this.$store.state.position = this.editedDevice.position
+      this.editedtSlaverIndex = this.editedDevice.slavers.indexOf(v)
     },
 
-    // 添加设备
-    devCommit() {
-      // 格式化数据
-      const data = {
-        addr: this.localName,
-        devID: this.devID,
-        deviceName: this.devName,
-        deviceType: this.devType,
-        position: `${this.position.lng},${this.position.lat}`,
-        slavers: this.$store.state.slavers,
-        username: this.$store.state.user.username
+    deleteItem(item) {
+      confirm(`确定删除 ${item.deviceName} 吗?`) &&
+        this.$store.dispatch('deleteDevice', { call: this, v: item })
+    },
+
+    commit() {
+      // 判断是否为更新
+      if (this.editedDeviceIndex >= 0) {
+        return this.$store.dispatch('putDevice', this)
+      }
+      this.$store.dispatch('postDevice', this)
+      this.close()
+    },
+
+    close() {
+      this.dialogForm = false
+      this.editedSlaver = Object.assign({ slaverName: '' })
+      this.editedDevice = Object.assign({
+        slavers: [],
+        deviceName: '',
+        devID: ''
+      })
+      this.editedDeviceIndex = -1
+      this.switch1 = false
+    },
+
+    save() {
+      // 验证数据
+      if (this.$refs.form.validate()) {
+        // 添加position
+        this.editedDevice.position = this.$store.state.position
+        this.editedDevice.addr = this.location
+        this.editedSlaver.slaverIndex = parseInt(this.editedSlaver.slaverIndex)
+        // 为添加数据点
+        if (this.switch1) {
+          this.editedDevice.slavers.push({ ...this.editedSlaver })
+        } else {
+          this.editedDevice.dataPoints.splice(this.editedtSlaverIndex, 1, {
+            ...this.editedSlaver
+          })
+        }
       }
 
-      this.$store.dispatch('postDevice', { data: { ...data }, call: this })
+      // 调整开关至修改数据点
+      this.switch1 = false
     }
   }
 }
