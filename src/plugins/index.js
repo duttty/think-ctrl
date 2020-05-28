@@ -1,7 +1,6 @@
 import './base'
 import './vcharts'
 import './vee-validate'
-import './element'
 import './axios'
 import './map'
 // import './notice'

@@ -120,8 +120,8 @@
                           </v-col>
                           <v-col cols="12" sm="6" md="4">
                             <v-text-field
-                              type="number"
                               v-model="editedDataPoint.frequency"
+                              type="number"
                               label="采集频率(s)"
                             />
                           </v-col>
@@ -188,21 +188,15 @@
           </v-img>
 
           <v-card-text>
-            <span
-              >采集指令:按modbus-rtu协议填写,省略从机地址位与CRC校验位。</span
-            >
-            <br />
-            <br />
+            <span>采集指令:按modbus-rtu协议填写,省略从机地址位与CRC校验位。</span>
+            <br>
+            <br>
             <v-divider />
-            <span
-              >采集指令:按modbus-rtu协议填写,省略从机地址位与CRC校验位。</span
-            >
-            <br />
-            <br />
+            <span>采集指令:按modbus-rtu协议填写,省略从机地址位与CRC校验位。</span>
+            <br>
+            <br>
             <v-divider />
-            <span
-              >采集公式:收到数据的处理公式，支持基本数学运算，使用v代表原始数据。</span
-            >
+            <span>采集公式:收到数据的处理公式，支持基本数学运算，使用v代表原始数据。</span>
             <v-divider />
           </v-card-text>
         </v-card>

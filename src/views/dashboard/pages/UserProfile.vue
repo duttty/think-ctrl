@@ -91,14 +91,13 @@
                           </v-col>
                           <v-col cols="12" sm="6" md="8">
                             <v-select
-                              no-data-text="请添加模板"
                               v-model="tS"
+                              no-data-text="请添加模板"
                               :items="$store.state.templates"
                               item-text="templateName"
                               item-value="id"
                               label="绑定模板"
                               return-object
-                              @change="selectTemplate"
                               :rules="[
                                 v => {
                                   if (v) {
@@ -107,6 +106,7 @@
                                   return '请选择数据模板'
                                 }
                               ]"
+                              @change="selectTemplate"
                             />
                           </v-col>
                           <v-col cols="12" md="4">
@@ -150,8 +150,8 @@
                                 class="text-center"
                                 :height="$store.state.mobile ? '60vh' : '30vh'"
                               >
-                                <myMaps
-                              /></v-sheet>
+                                <myMaps />
+                              </v-sheet>
                             </v-bottom-sheet>
                           </v-col>
                         </v-row>
@@ -199,12 +199,12 @@
 
           <v-card-text>
             <span>设备ID:填写8位数字。</span>
-            <br />
-            <br />
+            <br>
+            <br>
             <v-divider />
             <span>从机地址:填写Modbus协议的从机地址数字。</span>
-            <br />
-            <br />
+            <br>
+            <br>
             <v-divider />
             <span>设备地址:点击打开地图从地图上选取，也可以手动输入。</span>
             <v-divider />

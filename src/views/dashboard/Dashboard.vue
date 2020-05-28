@@ -6,15 +6,14 @@
           <div class="r_card primary">
             <div class="item_header">
               <div class="title">
-                变化趋势图
+                室温
               </div>
             </div>
             <div class="item_content">
               <div class="chart_wrap">
-                <!-- 原始代码 -->
-                <ve-histogram
-                  :data="chartData"
-                  :extend="chartExtend"
+                <ve-gauge
+                  :data="roomTemp"
+                  :settings="roomSetting"
                   height="240px"
                 />
               </div>
@@ -23,19 +22,18 @@
           <div class="r_card  primary">
             <div class="item_header">
               <div class="title">
-                变化趋势
+                光照度
               </div>
             </div>
             <div class="item_content">
               <div class="tool">
                 <div class="t">
                   <div class="i">
-                    变化率
+                    当前值：54
                   </div>
-                  <div class="r"><v-icon>mdi-arrow-up</v-icon>38%</div>
-                </div>
-                <div class="v">
-                  584
+                  <div class="r">
+                    <v-icon>mdi-arrow-up</v-icon>38%
+                  </div>
                 </div>
               </div>
               <div class="chart_wrap chart_wrap1">
@@ -160,24 +158,107 @@
           </div> -->
           <div class="item_header">
             <button class="title" @click="changeType">
-              切换显示模式
+              设备控制
             </button>
           </div>
           <div class="item_content">
             <div class="chart_wrap" style="margin-top: 30px">
-              <!-- <ve-line
-                :data="chartData3"
-                :extend="chartExtend3"
-                :settings="chartSettings3"
-                height="560px"
-              /> -->
+              <v-row>
+                <v-col cols="12" md="2">
+                  灯光控制
+                </v-col>
+                <v-col cols="12" md="10">
+                  <v-slider
+                    v-model="slider"
+                    thumb-label="always"
+                    thumb-color="red"
+                    color="green"
+                    track-color="red"
+                  />
+                </v-col>
+                <v-col cols="12" md="2">
+                  窗帘控制
+                </v-col>
+                <v-col cols="12" md="10">
+                  <v-slider
+                    v-model="chuanglian"
+                    thumb-label="always"
+                    thumb-color="red"
+                    color="green"
+                    track-color="red"
+                  />
+                </v-col>
 
-              <ve-chart
-                :data="chartData"
-                :settings="chartSettingsNew"
-                :extend="chartExtend"
-                height="500px"
-              ></ve-chart>
+                <v-col cols="12" md="12">
+                  <div class="kongtiao">
+                    <v-card class="mx-auto" max-width="600">
+                      <v-toolbar flat dense>
+                        <v-toolbar-title>
+                          <span class="subheading">空调控制</span>
+                        </v-toolbar-title>
+                        <v-spacer />
+                      </v-toolbar>
+
+                      <v-card-text>
+                        <v-row class="mb-4" justify="space-between">
+                          <v-col class="text-left">
+                            <span
+                              class="display-3 font-weight-light"
+                              v-text="bpm"
+                            />
+                            <span class="subheading font-weight-light mr-1">℃</span>
+                            <v-fade-transition>
+                              <v-avatar
+                                v-if="isPlaying"
+                                :color="color"
+                                :style="{
+                                  animationDuration: animationDuration
+                                }"
+                                class="mb-1 v-avatar--metronome"
+                                size="12"
+                              />
+                            </v-fade-transition>
+                          </v-col>
+                          <v-col class="text-right">
+                            <v-btn
+                              :color="color"
+                              dark
+                              depressed
+                              fab
+                              @click="toggle"
+                            >
+                              <v-icon large>
+                                {{ isPlaying ? 'mdi-pause' : 'mdi-play' }}
+                              </v-icon>
+                            </v-btn>
+                          </v-col>
+                        </v-row>
+
+                        <v-slider
+                          v-model="bpm"
+                          :color="color"
+                          track-color="grey"
+                          always-dirty
+                          min="15"
+                          max="35"
+                        >
+                          <template v-slot:prepend>
+                            <v-icon :color="color" @click="decrement">
+                              mdi-minus
+                            </v-icon>
+                          </template>
+
+                          <template v-slot:append>
+                            <v-icon :color="color" @click="increment">
+                              mdi-plus
+                            </v-icon>
+                          </template>
+                        </v-slider>
+                      </v-card-text>
+                    </v-card>
+                  </div>
+                </v-col>
+              </v-row>
             </div>
           </div>
         </div>
@@ -271,7 +352,7 @@
         <div class="item_content">
           <div
             class="image"
-            style='background-image: url("http://akveo.com/ngx-admin/assets/images/cover2.jpg"); background-position: center center;'
+            style="background-image: url(&quot;http://akveo.com/ngx-admin/assets/images/cover2.jpg&quot;); background-position: center center;"
           />
           <div class="title">
             Miusic - name
@@ -315,7 +396,36 @@ import echartMixins from '@/mixins/echart-settings'
 export default {
   mixins: [echartMixins],
   data() {
+    this.roomSetting = {
+      labelMap: {
+        temp: '温度'
+      },
+      dataName: {
+        temp: '℃'
+      },
+      seriesMap: {
+        temp: {
+          min: -20,
+          max: 40
+        }
+      }
+    }
     return {
+      // 室内温湿度
+      roomTemp: {
+        columns: ['type', 'value'],
+        rows: [{ type: 'temp', value: 32 }]
+      },
+      // 控制区域
+      slider: 0,
+      // chuanglian
+      chuanglian: 0,
+      // kongtiao
+      bpm: 40,
+      interval: null,
+      isPlaying: false,
+
+      // ss
       media: 0,
       ex1: { label: 'color', val: 25, color: '#a16eff' },
       pieBoxVisible: false,
@@ -338,17 +448,24 @@ export default {
       index: 0
     }
   },
-  mounted() {
-    this.$vuetify.theme.themes.light.primary = '#323259'
-    // this.$store.commit('handleSetColor', '#323259')
-  },
   computed: {
     chartSettingsNew: {
       set: function() {},
       get: function() {
         return { type: this.typeArr[this.index] }
       }
+    },
+    color() {
+      if (this.bpm < 20) return 'indigo'
+      if (this.bpm < 25) return 'teal'
+      if (this.bpm < 30) return 'green'
+      if (this.bpm < 35) return 'orange'
+      return 'red'
     }
+  },
+  mounted() {
+    this.$vuetify.theme.themes.light.primary = '#323259'
+    // this.$store.commit('handleSetColor', '#323259')
   },
   methods: {
     // new
@@ -370,12 +487,38 @@ export default {
       console.log(url)
       this.url = url
       this.reversal = true
+    },
+
+    // kongtiao
+    decrement() {
+      this.bpm--
+    },
+    increment() {
+      this.bpm++
+    },
+    toggle() {
+      this.isPlaying = !this.isPlaying
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+@keyframes metronome-example {
+  from {
+    transform: scale(0.5);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+.v-avatar--metronome {
+  animation-name: metronome-example;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
 $cp: #323259;
 body {
   font-family: 'Roboto', 'sans-serif', 'Open Sans', 'PingFang SC',
