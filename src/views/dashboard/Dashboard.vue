@@ -31,9 +31,7 @@
                   <div class="i">
                     当前值：54
                   </div>
-                  <div class="r">
-                    <v-icon>mdi-arrow-up</v-icon>38%
-                  </div>
+                  <div class="r"><v-icon>mdi-arrow-up</v-icon>38%</div>
                 </div>
               </div>
               <div class="chart_wrap chart_wrap1">
@@ -206,7 +204,9 @@
                               class="display-3 font-weight-light"
                               v-text="bpm"
                             />
-                            <span class="subheading font-weight-light mr-1">℃</span>
+                            <span class="subheading font-weight-light mr-1"
+                              >℃</span
+                            >
                             <v-fade-transition>
                               <v-avatar
                                 v-if="isPlaying"
@@ -352,7 +352,7 @@
         <div class="item_content">
           <div
             class="image"
-            style="background-image: url(&quot;http://akveo.com/ngx-admin/assets/images/cover2.jpg&quot;); background-position: center center;"
+            style='background-image: url("http://akveo.com/ngx-admin/assets/images/cover2.jpg"); background-position: center center;'
           />
           <div class="title">
             Miusic - name
@@ -484,7 +484,6 @@ export default {
       this.reversal = !this.reversal
     },
     handleZoomCamera(url) {
-      console.log(url)
       this.url = url
       this.reversal = true
     },
